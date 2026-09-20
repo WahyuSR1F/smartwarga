@@ -3,8 +3,14 @@ import { eventRegistrations, eventReminderRules, events, notificationDeliveries,
 import { getDb } from "./db";
 import { sendWhatsAppTemplate } from "./whatsapp";
 
-/** Tolerance around the scheduled reminder time (Vercel Cron runs every 5 min). */
-const DUE_WINDOW_MS = 10 * 60_000;
+/**
+ * Vercel Hobby only allows a daily cron, so the scan looks a full day ahead
+ * and sends every reminder falling due in that window. Per-recipient dedup
+ * prevents duplicate WhatsApp messages on subsequent daily runs.
+ */
+const LOOKAHEAD_MS = 24 * 60 * 60_000;
+/** Late-send grace so reminders missed between daily runs still go out once. */
+const GRACE_MS = 12 * 60 * 60_000;
 
 type ReminderSendOutcome = { ok: true; eventId: string; sent: number } | { ok: true; skipped: string };
 
@@ -17,13 +23,13 @@ async function runReminderForRule(
   if (!rule.enabled) return { ok: true, skipped: "disabled" };
 
   if (respectWindow) {
-    // Scan mode (Vercel Cron): only fire within the window around
-    // (startsAt - minutesBefore). Per-recipient dedup below prevents double
-    // sends inside the window.
+    // Scan mode (daily Vercel Cron on Hobby): fire when the scheduled reminder
+    // time is within the next 24h (or recently passed). Per-recipient dedup
+    // below prevents double sends across daily runs.
     const startsAtMs = new Date(event.startsAt).getTime();
     const scheduledAt = startsAtMs - (rule.minutesBefore ?? 0) * 60_000;
     const now = Date.now();
-    if (now < scheduledAt - DUE_WINDOW_MS || now > scheduledAt + DUE_WINDOW_MS) {
+    if (now < scheduledAt - LOOKAHEAD_MS || now > scheduledAt + GRACE_MS) {
       return { ok: true, skipped: "not-due" };
     }
   }
@@ -69,8 +75,8 @@ export async function runEventReminderBatch(taskUid: string): Promise<{ ok: fals
 }
 
 /**
- * Vercel Cron path: no per-event scheduler exists, so scan every enabled rule
- * and send only the ones whose scheduled time falls inside the current window.
+ * Vercel Cron path (daily on Hobby plan): no per-event scheduler exists, so
+ * scan every enabled rule and send those due within the next 24 hours.
  */
 export async function runDueEventReminders(): Promise<{ processed: number; sent: number; skipped: number }> {
   const db = await getDb();
