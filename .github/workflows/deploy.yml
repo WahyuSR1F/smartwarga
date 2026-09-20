@@ -26,10 +26,10 @@ jobs:
           cache: pnpm
 
       - name: Pull Vercel environment
-        run: npx vercel@latest pull --yes --environment=production
+        run: npx vercel@latest pull --yes --environment=production --token="$VERCEL_TOKEN"
 
       - name: Build with Vercel
-        run: npx vercel@latest build --prod
+        run: npx vercel@latest build --prod --token="$VERCEL_TOKEN"
 
       - name: Deploy to Vercel
-        run: npx vercel@latest deploy --prebuilt --prod
+        run: npx vercel@latest deploy --prebuilt --prod --token="$VERCEL_TOKEN"
