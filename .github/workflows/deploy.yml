@@ -25,6 +25,13 @@ jobs:
           node-version: 22
           cache: pnpm
 
+      - name: Link Vercel project
+        # project.json uses raw IDs (not names), so this is unambiguous.
+        run: |
+          rm -rf .vercel
+          mkdir -p .vercel
+          printf '{"projectId":"%s","orgId":"%s"}' "$VERCEL_PROJECT_ID" "$VERCEL_ORG_ID" > .vercel/project.json
+
       - name: Pull Vercel environment
         run: npx vercel@latest pull --yes --environment=production --token="$VERCEL_TOKEN"
 
