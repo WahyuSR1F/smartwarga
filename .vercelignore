@@ -1,0 +1,9 @@
+dist
+build
+.manus-logs
+docs
+attached_assets
+coverage
+*.log
+.env
+.env.local

@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX `invoices_household_period_unique` ON `invoices` (`householdId`,`billingPeriodId`);
