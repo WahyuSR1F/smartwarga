@@ -3,9 +3,6 @@
   "buildCommand": "pnpm run build:client",
   "outputDirectory": "dist/public",
   "installCommand": "pnpm install",
-  "buildEnv": {
-    "VITE_DISABLE_REALTIME": "1"
-  },
   "functions": {
     "api/seo.ts": {
       "includeFiles": "dist/public/index.html"
