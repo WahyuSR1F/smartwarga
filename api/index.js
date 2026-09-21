@@ -729,21 +729,33 @@ async function verifySessionToken(token) {
 async function registerUser(input) {
   const db = await getDb();
   if (!db) throw new Error("Database tidak tersedia");
-  const existing = await db.select().from(users).where(eq2(users.email, input.email)).limit(1);
+  let existing;
+  try {
+    existing = await db.select().from(users).where(eq2(users.email, input.email)).limit(1);
+  } catch (error) {
+    console.error("[Auth] Database query failed during registration:", error);
+    throw new Error("Gagal mendaftar. Silakan coba lagi.");
+  }
   if (existing[0]) {
     throw new Error("Email sudah terdaftar");
   }
   const openId = `local_${crypto.randomUUID()}`;
   const passwordHash = hashPassword(input.password);
-  const [user] = await db.insert(users).values({
-    openId,
-    passwordHash,
-    name: input.name,
-    email: input.email,
-    loginMethod: "email",
-    role: input.role || "resident",
-    status: "active"
-  }).returning();
+  let user;
+  try {
+    [user] = await db.insert(users).values({
+      openId,
+      passwordHash,
+      name: input.name,
+      email: input.email,
+      loginMethod: "email",
+      role: input.role || "resident",
+      status: "active"
+    }).returning();
+  } catch (error) {
+    console.error("[Auth] Database insert failed during registration:", error);
+    throw new Error("Gagal membuat akun. Silakan coba lagi.");
+  }
   if (!user) throw new Error("Gagal membuat akun");
   const token = await createSessionToken({
     userId: user.id,
@@ -754,8 +766,14 @@ async function registerUser(input) {
 }
 async function loginUser(input) {
   const db = await getDb();
-  if (!db) throw new Error("Database tidak tersedia");
-  const result = await db.select().from(users).where(eq2(users.email, input.email)).limit(1);
+  if (!db) throw new Error("Email atau password salah");
+  let result;
+  try {
+    result = await db.select().from(users).where(eq2(users.email, input.email)).limit(1);
+  } catch (error) {
+    console.error("[Auth] Database query failed during login:", error);
+    throw new Error("Email atau password salah");
+  }
   const user = result[0];
   if (!user) {
     throw new Error("Email atau password salah");
@@ -767,7 +785,11 @@ async function loginUser(input) {
   if (!isValid) {
     throw new Error("Email atau password salah");
   }
-  await db.update(users).set({ lastSignedIn: /* @__PURE__ */ new Date(), updatedAt: /* @__PURE__ */ new Date() }).where(eq2(users.id, user.id));
+  try {
+    await db.update(users).set({ lastSignedIn: /* @__PURE__ */ new Date(), updatedAt: /* @__PURE__ */ new Date() }).where(eq2(users.id, user.id));
+  } catch (error) {
+    console.error("[Auth] Failed to update lastSignedIn:", error);
+  }
   const token = await createSessionToken({
     userId: user.id,
     openId: user.openId,
@@ -789,8 +811,13 @@ async function authenticateFromCookie(cookieHeader) {
   if (!session) return null;
   const db = await getDb();
   if (!db) return null;
-  const result = await db.select().from(users).where(eq2(users.id, session.userId)).limit(1);
-  return result[0] ?? null;
+  try {
+    const result = await db.select().from(users).where(eq2(users.id, session.userId)).limit(1);
+    return result[0] ?? null;
+  } catch (error) {
+    console.error("[Auth] Database query failed during cookie auth:", error);
+    return null;
+  }
 }
 
 // server/_core/authorize.ts
