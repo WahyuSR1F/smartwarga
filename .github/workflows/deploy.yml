@@ -63,19 +63,21 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          # Always start from a clean state so no stale .vercel/project.json
-          # from a previous run or the checked-out repo is reused.
+          # Start from a clean state so no stale .vercel/project.json from a
+          # previous run or the checked-out repo is reused.
           rm -rf .vercel
-          mkdir -p .vercel
 
-          cat > .vercel/project.json <<EOF
-          {
-            "projectId": "${VERCEL_PROJECT_ID}",
-            "orgId": "${VERCEL_ORG_ID}"
-          }
-          EOF
+          # Use the CLI's own linker (not a hand-written project.json). This
+          # writes a valid, API-verified .vercel/project.json and is the
+          # supported way to link non-interactively. --scope is the Vercel
+          # Team/Account ID (VERCEL_ORG_ID); --project is the Project ID.
+          npx vercel@latest link \
+            --yes \
+            --project="$VERCEL_PROJECT_ID" \
+            --scope="$VERCEL_ORG_ID" \
+            --token="$VERCEL_TOKEN"
 
-          echo "Wrote .vercel/project.json (projectId/orgId set from secrets)."
+          echo "Vercel project linked successfully."
 
       - name: Pull Vercel environment
         run: |
