@@ -1,11 +1,14 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "pnpm run build:client",
+  "buildCommand": "pnpm run build:client && pnpm run build:api",
   "outputDirectory": "dist/public",
   "installCommand": "pnpm install",
   "functions": {
-    "api/seo.ts": {
-      "includeFiles": "dist/public/index.html"
+    "api/index.js": {
+      "includeFiles": "api/shell.html"
+    },
+    "api/seo.js": {
+      "includeFiles": "api/shell.html"
     }
   },
   "crons": [

@@ -14,9 +14,9 @@ let cachedTemplate: string | null = null;
 function readShellTemplate(): string {
   if (!cachedTemplate) {
     const candidates = [
+      path.join(__dirname, "shell.html"),
+      path.join(process.cwd(), "api", "shell.html"),
       path.join(process.cwd(), "dist", "public", "index.html"),
-      path.join(process.cwd(), "..", "dist", "public", "index.html"),
-      path.join(__dirname, "..", "dist", "public", "index.html"),
     ];
     for (const candidate of candidates) {
       try {

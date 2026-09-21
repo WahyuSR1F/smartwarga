@@ -24,15 +24,44 @@ jobs:
           node-version: 22
           cache: pnpm
 
-      - name: Link Vercel project
-        # project.json uses raw IDs (not names), so this is unambiguous.
+      - name: Validate Vercel configuration
+        shell: bash
         run: |
+          set -euo pipefail
+
+          for variable in VERCEL_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID; do
+            if [[ -z "${!variable:-}" ]]; then
+              echo "::error::$variable is missing or empty"
+              exit 1
+            fi
+          done
+
+          echo "All required Vercel secrets are present."
+
+      - name: Link Vercel project
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Always start from a clean state so no stale .vercel/project.json
+          # from a previous run or the checked-out repo is reused.
           rm -rf .vercel
           mkdir -p .vercel
-          printf '{"projectId":"%s","orgId":"%s"}' "$VERCEL_PROJECT_ID" "$VERCEL_ORG_ID" > .vercel/project.json
+
+          cat > .vercel/project.json <<EOF
+          {
+            "projectId": "${VERCEL_PROJECT_ID}",
+            "orgId": "${VERCEL_ORG_ID}"
+          }
+          EOF
+
+          echo "Wrote .vercel/project.json (projectId/orgId set from secrets)."
 
       - name: Pull Vercel environment
-        run: npx vercel@latest pull --yes --environment=production --token="$VERCEL_TOKEN"
+        run: |
+          npx vercel@latest pull \
+            --yes \
+            --environment=production \
+            --token="$VERCEL_TOKEN"
 
       - name: Build with Vercel
         run: npx vercel@latest build --prod --token="$VERCEL_TOKEN"
