@@ -47,4 +47,26 @@ await copyFile(
   path.join(outDir, "shell.html"),
 );
 console.log("copied dist/public/index.html -> api/shell.html");
-console.log("API bundling complete.");
+
+// Fail early with a clear message if any expected serverless artifact is
+// missing. These files must exist (and must NOT be gitignored) because
+// vercel.json references them in `functions` and Vercel excludes
+// .gitignore-matched files from the deployment.
+const required = [
+  path.join(outDir, "index.js"),
+  path.join(outDir, "seo.js"),
+  path.join(outDir, "cron/event-reminder.js"),
+  path.join(outDir, "shell.html"),
+];
+for (const file of required) {
+  const { stat } = await import("node:fs/promises");
+  try {
+    await stat(file);
+  } catch {
+    console.error(`::error::Required serverless artifact missing: ${file}`);
+    console.error("::error::Run `pnpm run build:client` before `build:api`, then retry.");
+    process.exit(1);
+  }
+}
+
+console.log("API bundling complete. All serverless artifacts present.");
