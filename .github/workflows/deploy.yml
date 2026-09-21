@@ -24,17 +24,38 @@ jobs:
           node-version: 22
           cache: pnpm
 
-      - name: Validate Vercel configuration
+      - name: Validate Vercel secrets
         shell: bash
+        env:
+          VERCEL_TOKEN_VALUE: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID_VALUE: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID_VALUE: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
           set -euo pipefail
 
-          for variable in VERCEL_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID; do
-            if [[ -z "${!variable:-}" ]]; then
-              echo "::error::$variable is missing or empty"
-              exit 1
+          missing=0
+
+          check_secret() {
+            local name="$1"
+            local value="${2:-}"
+
+            if [[ -z "$value" ]]; then
+              echo "::error title=Missing Vercel secret::$name is MISSING or EMPTY. Please configure it in GitHub Settings > Secrets and variables > Actions."
+              missing=1
+            else
+              echo "$name: PRESENT"
             fi
-          done
+          }
+
+          check_secret "VERCEL_TOKEN" "$VERCEL_TOKEN_VALUE"
+          check_secret "VERCEL_ORG_ID" "$VERCEL_ORG_ID_VALUE"
+          check_secret "VERCEL_PROJECT_ID" "$VERCEL_PROJECT_ID_VALUE"
+
+          if [[ "$missing" -eq 1 ]]; then
+            echo "::error::One or more required Vercel secrets are missing or empty."
+            echo "::error::Please verify the secrets, then confirm by rerunning the workflow."
+            exit 1
+          fi
 
           echo "All required Vercel secrets are present."
 
