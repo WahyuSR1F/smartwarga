@@ -4,10 +4,10 @@
   "outputDirectory": "dist/public",
   "installCommand": "pnpm install",
   "functions": {
-    "api/index.js": {
+    "api/index.cjs": {
       "includeFiles": "api/shell.html"
     },
-    "api/seo.js": {
+    "api/seo.cjs": {
       "includeFiles": "api/shell.html"
     }
   },

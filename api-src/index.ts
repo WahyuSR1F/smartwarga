@@ -37,7 +37,6 @@ app.get("/api/whatsapp/webhook", (req, res) => {
   res.sendStatus(403);
 });
 
-app.post("/api/trpc", createExpressMiddleware({ router: appRouter, createContext }));
-app.get("/api/trpc", createExpressMiddleware({ router: appRouter, createContext }));
+app.use("/api/trpc", createExpressMiddleware({ router: appRouter, createContext }));
 
 export default app;

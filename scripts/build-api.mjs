@@ -17,9 +17,9 @@ const outDir = path.join(root, "api");
  * there are no longer any external relative .ts imports inside the function.
  */
 const entries = [
-  { in: "index.ts", out: "index.js" },
-  { in: "seo.ts", out: "seo.js" },
-  { in: "cron/event-reminder.ts", out: "cron/event-reminder.js" },
+  { in: "index.ts", out: "index.cjs" },
+  { in: "seo.ts", out: "seo.cjs" },
+  { in: "cron/event-reminder.ts", out: "cron/event-reminder.cjs" },
 ];
 
 for (const { in: input, out } of entries) {
@@ -31,7 +31,7 @@ for (const { in: input, out } of entries) {
     outfile,
     bundle: true,
     platform: "node",
-    format: "esm",
+    format: "cjs",
     target: "node20",
     packages: "external",
     logLevel: "info",
@@ -53,9 +53,9 @@ console.log("copied dist/public/index.html -> api/shell.html");
 // vercel.json references them in `functions` and Vercel excludes
 // .gitignore-matched files from the deployment.
 const required = [
-  path.join(outDir, "index.js"),
-  path.join(outDir, "seo.js"),
-  path.join(outDir, "cron/event-reminder.js"),
+  path.join(outDir, "index.cjs"),
+  path.join(outDir, "seo.cjs"),
+  path.join(outDir, "cron/event-reminder.cjs"),
   path.join(outDir, "shell.html"),
 ];
 for (const file of required) {
