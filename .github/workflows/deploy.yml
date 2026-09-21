@@ -59,6 +59,22 @@ jobs:
 
           echo "All required Vercel secrets are present."
 
+      - name: Verify Vercel authentication
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Validates that VERCEL_TOKEN maps to a real, existing Vercel user
+          # before we attempt to link. Surfaces credential problems early with
+          # a clear message instead of a cryptic 404 during `vercel link`.
+          # No secret values are printed.
+          if ! npx vercel@latest whoami --token="$VERCEL_TOKEN" 2>/tmp/whoami.err; then
+            echo "::error title=Vercel auth failed::VERCEL_TOKEN is invalid, revoked, expired, or belongs to a deleted Vercel account (User not found / 404)."
+            echo "::error::Update VERCEL_TOKEN (and verify VERCEL_ORG_ID and VERCEL_PROJECT_ID) in GitHub Settings > Secrets and variables > Actions, then rerun the workflow."
+            cat /tmp/whoami.err
+            exit 1
+          fi
+          echo "Vercel authentication OK."
+
       - name: Link Vercel project
         shell: bash
         run: |
@@ -71,6 +87,8 @@ jobs:
           # writes a valid, API-verified .vercel/project.json and is the
           # supported way to link non-interactively. --scope is the Vercel
           # Team/Account ID (VERCEL_ORG_ID); --project is the Project ID.
+          # If this fails with a 404/forbidden, the org/project IDs are wrong
+          # or the token lacks access — update the secrets, do not change code.
           npx vercel@latest link \
             --yes \
             --project="$VERCEL_PROJECT_ID" \
