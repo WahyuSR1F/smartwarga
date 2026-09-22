@@ -510,7 +510,6 @@ var t = initTRPC.context().create({
   transformer: superjson
 });
 var router = t.router;
-var publicProcedure = t.procedure;
 var requireUser = t.middleware(async (opts) => {
   const { ctx, next } = opts;
   if (!ctx.user) {
@@ -523,7 +522,20 @@ var requireUser = t.middleware(async (opts) => {
     }
   });
 });
-var protectedProcedure = t.procedure.use(requireUser);
+var errorHandler = t.middleware(async ({ next }) => {
+  try {
+    return await next();
+  } catch (err) {
+    if (err instanceof TRPCError2) throw err;
+    console.error("[tRPC] Unhandled error:", err);
+    throw new TRPCError2({
+      code: "INTERNAL_SERVER_ERROR",
+      message: "Terjadi kesalahan. Silakan coba lagi."
+    });
+  }
+});
+var protectedProcedure = t.procedure.use(requireUser).use(errorHandler);
+var publicProcedure = t.procedure.use(errorHandler);
 var adminProcedure = t.procedure.use(
   t.middleware(async (opts) => {
     const { ctx, next } = opts;
@@ -537,7 +549,7 @@ var adminProcedure = t.procedure.use(
       }
     });
   })
-);
+).use(errorHandler);
 
 // server/_core/systemRouter.ts
 var systemRouter = router({
