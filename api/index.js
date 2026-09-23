@@ -1717,6 +1717,14 @@ app.get("/api/whatsapp/webhook", (req, res) => {
   }
   res.sendStatus(403);
 });
+app.get("/debug/env", (req, res) => {
+  res.json({
+    tursoDatabaseUrl: process.env.TURSO_DATABASE_URL ? "\u2713 (set)" : "\u2717 (NOT SET)",
+    tursoAuthToken: process.env.TURSO_AUTH_TOKEN ? "\u2713 (set)" : "\u2717 (NOT SET)",
+    hasDatabaseUrl: !!process.env.TURSO_DATABASE_URL,
+    hasAuthToken: !!process.env.TURSO_AUTH_TOKEN
+  });
+});
 app.use("/api/trpc", createExpressMiddleware({ router: appRouter, createContext }));
 var index_default = app;
 export {
