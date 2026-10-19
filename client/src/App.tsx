@@ -1,5 +1,5 @@
 import { Toaster } from "@/components/ui/sonner";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Route, Router as WouterRouter, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -59,6 +59,23 @@ function Router({ ssrPath, ssrSearch }: { ssrPath?: string; ssrSearch?: string }
   );
 }
 
+function SupportFlowLoader() {
+  useEffect(() => {
+    (window as any).SUPPORTFLOW_WIDGET_CONFIG = {
+      baseUrl: "https://supportflow-alpha.vercel.app",
+      conversationId: "support-sesi-001",
+      title: "Northstar concierge",
+      accentColor: "#4263eb",
+      endpoints: "*",
+    };
+    const s = document.createElement("script");
+    s.src = "https://supportflow-alpha.vercel.app/supportflow-widget.js";
+    s.async = true;
+    document.body.appendChild(s);
+  }, []);
+  return null;
+}
+
 function App({ ssrPath, ssrSearch }: { ssrPath?: string; ssrSearch?: string }) {
   return (
     <ErrorBoundary>
@@ -67,6 +84,7 @@ function App({ ssrPath, ssrSearch }: { ssrPath?: string; ssrSearch?: string }) {
           <Toaster />
           <Router ssrPath={ssrPath} ssrSearch={ssrSearch} />
           <PwaInstallPrompt />
+          <SupportFlowLoader />
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>
