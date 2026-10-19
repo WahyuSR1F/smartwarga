@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CalendarDays, ChevronRight, Clock3, MoreHorizontal, Plus, ShieldCheck, Sparkles, UsersRound, WalletCards } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 
 const navLabels: Record<string, string> = {
@@ -16,6 +17,10 @@ const navLabels: Record<string, string> = {
 };
 
 export default function CommunityDashboard() {
+  const [today, setToday] = useState("");
+  useEffect(() => {
+    setToday(new Date().toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }));
+  }, []);
   const [location] = useLocation();
   const { user } = useAuth();
   const { data: memberships } = trpc.community.organizations.useQuery();
@@ -33,7 +38,7 @@ export default function CommunityDashboard() {
           <h1 className="mt-3 text-3xl font-semibold tracking-[-0.05em] text-[#183d34] sm:text-4xl">{isResidentView ? `Selamat datang, ${user?.name ?? "warga"}.` : activeLabel}</h1>
           <p className="mt-2 max-w-[600px] text-sm leading-6 text-[#70857b]">{isResidentView ? "Berikut kabar terbaru dan hal yang perlu Anda perhatikan di lingkungan Kampung Melati." : `Kelola ${activeLabel.toLowerCase()} dengan alur yang ringkas dan terukur.`}</p>
         </div>
-        <div className="flex items-center gap-2"><Button variant="outline" className="h-10 rounded-xl border-[#dbe7df] bg-white text-[#46675b] hover:bg-[#f3f7f4]"><Clock3 className="mr-2 h-4 w-4" /> {new Date().toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}</Button><Button className="h-10 rounded-xl bg-[#173b33] text-white shadow-sm hover:bg-[#255649]"><Plus className="mr-2 h-4 w-4" /> Buat baru</Button></div>
+        <div className="flex items-center gap-2"><Button variant="outline" className="h-10 rounded-xl border-[#dbe7df] bg-white text-[#46675b] hover:bg-[#f3f7f4]"><Clock3 className="mr-2 h-4 w-4" /> {today}</Button><Button className="h-10 rounded-xl bg-[#173b33] text-white shadow-sm hover:bg-[#255649]"><Plus className="mr-2 h-4 w-4" /> Buat baru</Button></div>
       </section>
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
