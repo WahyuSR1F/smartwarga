@@ -21,7 +21,7 @@ export default function FloatingChat() {
         className="fixed bottom-6 right-6 z-[2147483000] grid h-14 w-14 place-items-center rounded-full bg-[#25D366] text-white shadow-lg hover:scale-105 transition"
         aria-label="Buka chat"
       >
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
         </svg>
       </button>
@@ -52,6 +52,9 @@ export default function FloatingChat() {
             <button onClick={send} className="rounded-lg bg-[#25D366] px-3 py-2 text-sm text-white">
               Kirim
             </button>
+          </div>
+          <div className="border-t bg-gray-50 px-3 py-1 text-center text-[10px] text-gray-400">
+            Powered by SupportFlow AI
           </div>
         </div>
       )}
