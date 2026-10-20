@@ -26,7 +26,7 @@ export default function FloatingChat() {
         </svg>
       </button>
       {open && (
-        <div className="fixed bottom-24 right-6 z-[2147483001] flex h-[520px] w-[360px] max-w-[calc(100vw-32px)] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl">
+        <div className="fixed bottom-24 right-4 z-[2147483001] flex h-[70vh] w-[calc(100vw-32px)] max-w-[360px] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl sm:right-6">
           <div className="flex items-center justify-between bg-[#25D366] px-4 py-3 text-white">
             <div>
               <p className="font-semibold">Support Chat</p>
