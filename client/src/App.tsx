@@ -88,7 +88,6 @@ function App({ ssrPath, ssrSearch }: { ssrPath?: string; ssrSearch?: string }) {
           <Toaster />
           <Router ssrPath={ssrPath} ssrSearch={ssrSearch} />
            <PwaInstallPrompt />
-           <FloatingChat />
            <SupportFlowLoader />
         </TooltipProvider>
       </ThemeProvider>
