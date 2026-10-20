@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Route, Router as WouterRouter, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import PwaInstallPrompt from "./components/PwaInstallPrompt";
+import FloatingChat from "./components/FloatingChat";
 import { ThemeProvider } from "./contexts/ThemeContext";
 
 const NotFound = lazy(() => import("@/pages/NotFound"));
@@ -65,12 +66,15 @@ function SupportFlowLoader() {
       baseUrl: "https://supportflow-alpha.vercel.app",
       conversationId: "support-sesi-001",
       title: "Northstar concierge",
-      accentColor: "#4263eb",
+      accentColor: "#173b33",
       endpoints: "*",
     };
     const s = document.createElement("script");
     s.src = "https://supportflow-alpha.vercel.app/supportflow-widget.js";
     s.async = true;
+    s.onload = () => {
+      (window as any).SupportFlowWidget?.init?.((window as any).SUPPORTFLOW_WIDGET_CONFIG);
+    };
     document.body.appendChild(s);
   }, []);
   return null;
@@ -83,8 +87,9 @@ function App({ ssrPath, ssrSearch }: { ssrPath?: string; ssrSearch?: string }) {
         <TooltipProvider>
           <Toaster />
           <Router ssrPath={ssrPath} ssrSearch={ssrSearch} />
-          <PwaInstallPrompt />
-          <SupportFlowLoader />
+           <PwaInstallPrompt />
+           <FloatingChat />
+           <SupportFlowLoader />
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>
