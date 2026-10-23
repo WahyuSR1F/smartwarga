@@ -62,18 +62,21 @@ function Router({ ssrPath, ssrSearch }: { ssrPath?: string; ssrSearch?: string }
 
 function SupportFlowLoader() {
   useEffect(() => {
-    (window as any).SUPPORTFLOW_WIDGET_CONFIG = {
+    const config = {
       baseUrl: "https://supportflow-alpha.vercel.app",
       conversationId: "support-sesi-001",
       title: "Northstar concierge",
       accentColor: "#173b33",
       endpoints: "*",
     };
+    (window as any).SUPPORTFLOW_WIDGET_CONFIG = config;
     const s = document.createElement("script");
     s.src = "https://supportflow-alpha.vercel.app/supportflow-widget.js";
     s.async = true;
     s.onload = () => {
-      (window as any).SupportFlowWidget?.init?.((window as any).SUPPORTFLOW_WIDGET_CONFIG);
+      const api = (window as any).SupportFlowWidget?.init?.(config);
+      const host = api?.host ?? document.getElementById("sfw-root");
+      if (host) host.style.setProperty("--sfw-accent", config.accentColor);
     };
     document.body.appendChild(s);
   }, []);
