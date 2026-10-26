@@ -64,14 +64,13 @@ function SupportFlowLoader() {
   useEffect(() => {
     const config = {
       baseUrl: "https://supportflow-alpha.vercel.app",
-      conversationId: "support-sesi-001",
       title: "Northstar concierge",
       accentColor: "#173b33",
       endpoints: "*",
     };
     (window as any).SUPPORTFLOW_WIDGET_CONFIG = config;
     const s = document.createElement("script");
-    s.src = "https://supportflow-alpha.vercel.app/supportflow-widget.js?v=2";
+    s.src = "https://supportflow-alpha.vercel.app/supportflow-widget.js?v=3";
     s.async = true;
     s.onload = () => {
       const api = (window as any).SupportFlowWidget?.init?.(config);
