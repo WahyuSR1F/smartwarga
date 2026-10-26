@@ -64,8 +64,8 @@ function SupportFlowLoader() {
   useEffect(() => {
     const config = {
       baseUrl: "https://supportflow-alpha.vercel.app",
-      title: "Northstar concierge",
-      accentColor: "#173b33",
+      title: "SupportFlow",
+      accentColor: "#4263eb",
       endpoints: "*",
     };
     (window as any).SUPPORTFLOW_WIDGET_CONFIG = config;
