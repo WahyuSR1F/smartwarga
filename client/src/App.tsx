@@ -71,7 +71,7 @@ function SupportFlowLoader() {
     };
     (window as any).SUPPORTFLOW_WIDGET_CONFIG = config;
     const s = document.createElement("script");
-    s.src = "https://supportflow-alpha.vercel.app/supportflow-widget.js";
+    s.src = "https://supportflow-alpha.vercel.app/supportflow-widget.js?v=2";
     s.async = true;
     s.onload = () => {
       const api = (window as any).SupportFlowWidget?.init?.(config);
